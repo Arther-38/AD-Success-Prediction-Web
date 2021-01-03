@@ -32,16 +32,27 @@ test=test.rename(columns={'average_runtime(minutes_per_week)':'ave_runtime'})
 train['netgain']=np.where(train['netgain']=='False','FALSE',train['netgain'])
 train['netgain']=np.where(train['netgain']=='True','TRUE',train['netgain'])
 #%%
-train['netgain']=np.where(train['netgain']=='False','FALSE',train['netgain'])
 train['netgain']=np.where(train['netgain']=='True','TRUE',train['netgain'])
+train['netgain']=np.where(train['netgain']=='False','FALSE',train['netgain'])
 #%%
-print(train['ave_runtime'])
+print(train['netgain'])
 #%%
 train1=train.copy()
 test1=test.copy()
 train1= train1.drop(['id'],axis=1)
 test1 = test1.drop(['id'],axis=1)
 
+from sklearn.preprocessing import LabelEncoder
+le=LabelEncoder()
+train1['netgain']=le.fit_transform(train1['netgain'])
+
+print(train1['netgain'])
+
+
+from sklearn.preprocessing import StandardScaler
+scale = StandardScaler()
+
+#print(train1)
 
 #%%
 from sklearn.model_selection import train_test_split
@@ -63,13 +74,14 @@ from sklearn.linear_model import LogisticRegression
 from sklearn.metrics import accuracy_score
 logreg = LogisticRegression(solver='liblinear')
 logreg=logreg.fit(X_train,y_train)
-
+print(y_train)
 #%%
 
 from sklearn.metrics import roc_auc_score
 from sklearn.metrics import roc_curve
 #y_test,X_test,logreg
 def ROC_CURVE(data1,data2,model):
+
     logit_roc_auc = roc_auc_score(data2, model.predict(data1))
     fpr, tpr, thresholds = roc_curve(data2, model.predict_proba(data1)[:,1])
     
@@ -121,6 +133,8 @@ y_pred = logreg.predict(X_test)
 
 test1 = pd.get_dummies(test1,columns=['relationship_status','industry','genre','targeted_sex','airtime','airlocation','expensive','money_back_guarantee'])
 #%%
+print(test1)
+#%%
 
 missing_cols = set( X.columns ) - set( test1.columns )
 # Add a missing column in test set with default value equal to 0
@@ -132,9 +146,9 @@ test1 = test1[X.columns]
 test_pred = logreg.predict(test1)
 
 print(test_pred[0:100])
-
 #%%
 import streamlit as st
+
 data_select=['Selection','資料相關性繪圖','模型預測','預測結果']
 model_select=['ROC曲線','結果分類報告','混淆矩陣']
 category_type=['sequence','non-sequence','half']
@@ -144,9 +158,9 @@ st.title('AD-Success Prediction:')
 st.subheader('訓練資料集')
 st.write('Dataset Source: https://www.kaggle.com/chetanambi/predict-ad-success?select=Train.csv')
 st.write('ad-train data: ')
-st.write(train.drop(columns=['netgain']))
+st.write(train.drop(columns=['netgain'])[0:10])
 st.write('ad-train- target: ')
-st.write(train['netgain'])
+st.write(train['netgain'][0:10])
 
 
 st.sidebar.title('Welcome to my AI Website!')
@@ -181,7 +195,7 @@ if select=='資料相關性繪圖':
             
 elif select =='模型預測':
     st.success('無序資料進行獨熱編碼, 有序資料進行標準化: ')
-    st.write(X)
+    st.write(X[0:10])
     st.write('shape:')
     st.json({'row':X.shape[0],'col':X.shape[1],'test_size':0.33})
     choose_model=['logistic Regression']
@@ -236,13 +250,21 @@ elif select =='預測結果':
         st.write(new)
         
         #print(new)
-        if st.checkbox("開始預測: "):
-            final=logreg.predict(new)
-            st.success(final)
+
+        final=logreg.predict(new)
+        
+        if final==0:
+            final='False'
+        else:
+            final='True'
+        
+        st.success(final)
 
 #%%
 '''
-dfprediction=pd.DataFrame( {'index':test1.index ,'netgain': test_pred})
+
 print(dfprediction)
 output = dfprediction.to_csv('submission2.csv', index=False)
+
+print(train1['netgain'].value_counts())
 '''
