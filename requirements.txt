@@ -3,3 +3,5 @@ seaborn
 matplotlib
 streamlit
 pandas
+os
+base64
