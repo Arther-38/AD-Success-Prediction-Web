@@ -9,6 +9,7 @@ import pandas as pd
 import seaborn as sns
 import matplotlib.pyplot as plt 
 import numpy as np
+import base64
 wkDir = "c:/Users/user/OneDrive/桌面/Dataset";   os.chdir(wkDir)
 train=pd.read_csv('Train.csv')
 test=pd.read_csv('Test.csv')
@@ -45,15 +46,6 @@ test1 = test1.drop(['id'],axis=1)
 from sklearn.preprocessing import LabelEncoder
 le=LabelEncoder()
 train1['netgain']=le.fit_transform(train1['netgain'])
-
-print(train1['netgain'])
-
-
-from sklearn.preprocessing import StandardScaler
-scale = StandardScaler()
-
-#print(train1)
-
 #%%
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import accuracy_score
@@ -259,12 +251,44 @@ elif select =='預測結果':
             final='True'
         
         st.success(final)
+        
+        st.write('下載結果:')
+        if st.button('download button'):
+            dfprediction=pd.DataFrame ({'netgain':test_pred},columns=['netgain'])
+            dfprediction[dfprediction['netgain']==0]='False'
+            dfprediction[dfprediction['netgain']==1]='True'
+            print(dfprediction)
+            
+            test_result=pd.concat([test,dfprediction],axis=1)
+            
+            from io import BytesIO
+            def to_excel(df):
+                output = BytesIO()
+                writer = pd.ExcelWriter(output, engine='xlsxwriter')
+                df.to_excel(writer, sheet_name='Sheet1')
+                writer.save()
+                processed_data = output.getvalue()
+                return processed_data
+            
+            def get_table_download_link(df):
+                val = to_excel(df)
+                b64 = base64.b64encode(val)  # val looks like b'...'
+                return f'<a href="data:application/octet-stream;base64,{b64.decode()}" download="extract.xlsx">Download csv file</a>'
+            st.markdown(get_table_download_link(test_result), unsafe_allow_html=True)
 
+            print(test_result)
+            output = test_result.to_csv('prediction_result.csv', index=False)
+
+            st.write(test_result[0:20])
 #%%
-'''
 
+dfprediction=pd.DataFrame ({'netgain':test_pred},columns=['netgain'])
+dfprediction[dfprediction['netgain']==0]='False'
+dfprediction[dfprediction['netgain']==1]='True'
 print(dfprediction)
-output = dfprediction.to_csv('submission2.csv', index=False)
 
-print(train1['netgain'].value_counts())
-'''
+test_result=pd.concat([test,dfprediction],axis=1)
+print(test_result)
+output = test_result.to_csv('prediction_result.csv', index=False)
+
+#print(train1['netgain'].value_counts())
