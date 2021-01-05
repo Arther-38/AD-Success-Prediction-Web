@@ -9,7 +9,7 @@ import pandas as pd
 import seaborn as sns
 import matplotlib.pyplot as plt 
 import numpy as np
-import base64
+
 wkDir = "c:/Users/user/OneDrive/桌面/Dataset";   os.chdir(wkDir)
 train=pd.read_csv('Train.csv')
 test=pd.read_csv('Test.csv')
