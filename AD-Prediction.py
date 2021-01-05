@@ -249,8 +249,8 @@ elif select =='預測結果':
             final='False'
         else:
             final='True'
-        
-        st.success(final)
+        if st.button('顯示結果:'):
+            st.success(final)
         
         st.write('下載結果:')
         if st.button('download button'):
