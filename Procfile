@@ -1,1 +1,1 @@
-web: sh ssetup.sh && streamlit run AD-Prediction.py
+web: sh setup.sh && streamlit run AD-Prediction.py
