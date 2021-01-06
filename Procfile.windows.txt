@@ -1,0 +1,1 @@
+web: python AD-Prediction.py runserver 0.0.0.0:5000
