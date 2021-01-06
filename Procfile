@@ -1,1 +1,1 @@
-web: sh ssetup.sh && streamlit run AD-SUCCESS-PREDICTION.py
+web: sh ssetup.sh && streamlit run AD-Prediction.py
